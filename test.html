@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestion d'Utilisateurs</title>
+   <link rel="stylesheet" href="test.css">
+
+</head>
+<body>
+    <!-- Page de Connexion -->
+    <div id="loginPage" class="container">
+        <div class="card login-card">
+            <h1>Connexion</h1>
+            <form id="loginForm">
+                <div class="form-group">
+                    <label for="loginEmail">Email :</label>
+                    <input type="email" id="loginEmail" required>
+                </div>
+                <div class="form-group">
+                    <label for="loginPassword">Mot de passe :</label>
+                    <input type="password" id="loginPassword" required>
+                </div>
+                <div class="error" id="loginError">Email ou mot de passe incorrect</div>
+                <button type="submit" class="btn btn-primary">Se connecter</button>
+            </form>
+        </div>
+    </div>
+
+
+    <!-- Page d'Accueil -->
+    <div id="homePage" class="container hidden">
+        <div class="card">
+            <h1>Page d'Accueil</h1>
+            <h2>Ajouter un nouvel utilisateur</h2>
+            
+            <form id="userForm">
+                <div class="form-group">
+                    <label for="fullName">Nom complet :</label>
+                    <input type="text" id="fullName" required>
+                    <div class="error" id="nameError">Le nom complet est requis</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="email">Email :</label>
+                    <input type="email" id="email" required>
+                    <div class="error" id="emailError">Format d'email invalide</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="password">Mot de passe :</label>
+                    <input type="password" id="password" required>
+                    <div class="error" id="passwordError">Le mot de passe est requis</div>
+                </div>
+                
+                <div class="form-group">
+                    <label for="confirmPassword">Confirmation du mot de passe :</label>
+                    <input type="password" id="confirmPassword" required>
+                    <div class="error" id="confirmError">Les mots de passe ne correspondent pas</div>
+                </div>
+                
+                <button type="submit" class="btn btn-primary">Ajouter l'utilisateur</button>
+            </form>
+
+            <div id="userList" class="user-list">
+                <h2>Liste des utilisateurs</h2>
+                <div id="users"></div>
+            </div>
+        </div>
+    </div>
+
+    <script src="test.js"></script>
+</body>
+</html>
