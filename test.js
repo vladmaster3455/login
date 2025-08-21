@@ -171,12 +171,13 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     tableBody.addEventListener('click', function(e) {
         if (e.target.tagName === 'BUTTON') {
-            const action = e.target.dataset.action
+            const action = e.target.dataset.action  //Quand un utilisateur clique quelque part dans le tableBody, cette fonction s'exécute.
             const row = e.target.closest('tr');
             const id = parseInt(row.dataset.id);
             const profile = profiles.find(p => p.id === id);
             
-            if (action === 'delete') {
+            if (action === 'delete') {     // On vérifie si l'utilisateur a cliqué sur un bouton (<button>).
+                                          //Si ce n’est pas un bouton, le reste du code ne s'exécute pas.
                 if (confirm('Supprimer ce profil ?')) {
                     // Au lieu de le supprimer, on le cache
                     profile.visible = false;
