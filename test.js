@@ -2,7 +2,7 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // =========================================================================
     // 1. DÉCLARATION ET INITIALISATION DES DONNÉES
-    // =========================================================================
+    // ====================================================================
     const adminEmail = 'admin@otaku.dev';
     const adminPassword = 'sugoimypassword';
 
@@ -34,7 +34,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // =========================================================================
     
     function checkEmail(email) {
-        return email.includes('@') && email.includes('.');
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailPattern.test(email);
     }
 
     function checkPassword(password) {
