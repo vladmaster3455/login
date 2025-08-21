@@ -171,7 +171,7 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     tableBody.addEventListener('click', function(e) {
         if (e.target.tagName === 'BUTTON') {
-            const action = e.target.dataset.action;
+            const action = e.target.dataset.action
             const row = e.target.closest('tr');
             const id = parseInt(row.dataset.id);
             const profile = profiles.find(p => p.id === id);
