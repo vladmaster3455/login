@@ -3,72 +3,517 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestion d'Utilisateurs</title>
-   <link rel="stylesheet" href="test.css">
+    <title>Le Labo du Codeur Fou</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
 
+        body {
+            font-family: Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            color: #333;
+        }
+
+        .hidden {
+            display: none !important;
+        }
+
+        /* Page de connexion */
+        .login-container {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+        }
+
+        .login-card {
+            background: white;
+            padding: 40px;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .login-card h1 {
+            text-align: center;
+            color: #667eea;
+            margin-bottom: 30px;
+        }
+
+        /* Formulaires */
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: bold;
+        }
+
+        .form-group input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #ddd;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+
+        .form-group input:focus {
+            border-color: #667eea;
+            outline: none;
+        }
+
+        .password-container {
+            position: relative;
+        }
+
+        .show-password {
+            position: absolute;
+            right: 12px;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            color: #666;
+        }
+
+        .error-message {
+            color: red;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+
+        .message-reussite {
+            color: green !important;
+        }
+
+        /* Boutons */
+        .bouton-sasuke, .bouton-creer-compte {
+            width: 100%;
+            padding: 12px;
+            border: none;
+            border-radius: 8px;
+            font-size: 16px;
+            font-weight: bold;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+
+        .bouton-sasuke {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .bouton-creer-compte {
+            background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+            color: white;
+        }
+
+        .bouton-sasuke:hover, .bouton-creer-compte:hover {
+            transform: translateY(-2px);
+        }
+
+        /* Dashboard */
+        .header-otaku {
+            background: white;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1);
+        }
+
+        .titre-senpai {
+            color: #667eea;
+            font-size: 2em;
+            text-align: center;
+        }
+
+        .main-content {
+            padding: 30px;
+            max-width: 800px;
+            margin: 0 auto;
+        }
+
+        .section-creer-compte, .section-liste-nakama {
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            margin-bottom: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+        }
+
+        .section-creer-compte h2, .section-liste-nakama h2 {
+            color: #667eea;
+            margin-bottom: 20px;
+        }
+
+        /* Tableau */
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            background: white;
+            border-radius: 10px;
+            overflow: hidden;
+        }
+
+        th, td {
+            padding: 15px;
+            text-align: left;
+            border-bottom: 1px solid #eee;
+        }
+
+        th {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        tr:hover {
+            background-color: #f8f9ff;
+        }
+
+        .statut-validé {
+            background: #27ae60;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .statut-en-attente-de-déploiement {
+            background: #f39c12;
+            color: white;
+            padding: 5px 10px;
+            border-radius: 15px;
+            font-size: 12px;
+        }
+
+        .bouton-action {
+            padding: 8px 15px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 12px;
+            margin-right: 5px;
+        }
+
+        .bouton-statut {
+            background: #3498db;
+            color: white;
+        }
+
+        .bouton-statut.valide {
+            background: #e74c3c;
+        }
+
+        .bouton-supprimer {
+            background: #e74c3c;
+            color: white;
+        }
+    </style>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.2/css/all.min.css">
 </head>
 <body>
-    <!-- Page de Connexion -->
-    <div id="loginPage" class="container">
-        <div class="card login-card">
-            <h1>Connexion</h1>
-            <form id="loginForm">
+
+    <!-- Page de connexion -->
+    <div id="login-screen" class="login-container">
+        <div class="login-card">
+            <h1>Login Codeur</h1>
+            <form id="login-form">
                 <div class="form-group">
-                    <label for="loginEmail">Email :</label>
-                    <input type="email" id="loginEmail" required>
+                    <label for="email-login">Email</label>
+                    <input type="email" id="email-login" placeholder="exemple@gmail.com" required>
                 </div>
                 <div class="form-group">
-                    <label for="loginPassword">Mot de passe :</label>
-                    <input type="password" id="loginPassword" required>
+                    <label for="password-login">Mot de passe</label>
+                    <div class="password-container">
+                        <input type="password" id="password-login" required>
+                        <i class="fa-solid fa-eye show-password" id="show-password-login"></i>
+                    </div>
                 </div>
-                <div class="error" id="loginError">Email ou mot de passe incorrect</div>
-                <button type="submit" class="btn btn-primary">Se connecter</button>
+                <button type="submit" class="bouton-sasuke">Démarrer le système !</button>
+                <p id="error-message-global"></p>
             </form>
         </div>
     </div>
 
+    <!-- Dashboard admin -->
+    <div id="admin-dashboard" class="hidden">
+        <header class="header-otaku">
+            <h1 class="titre-senpai">Bienvenue, Admin <i class="fa-solid fa-hand-wave"></i></h1>
+        </header>
 
-    <!-- Page d'Accueil -->
-    <div id="homePage" class="container hidden">
-        <div class="card">
-            <h1>Page d'Accueil</h1>
-            <h2>Ajouter un nouvel utilisateur</h2>
+        <main class="main-content">
+            <!-- Formulaire de création de profil -->
+            <section class="section-creer-compte">
+                <h2>Créer un nouveau profil <i class="fa-solid fa-handshake"></i></h2>
+                <form id="create-account-form">
+                    <div class="form-group">
+                        <label for="nom-compte">Nom</label>
+                        <input type="text" id="nom-compte" required>
+                        <span class="error-message" id="error-nom-compte"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="prenom-compte">Prénom</label>
+                        <input type="text" id="prenom-compte" required>
+                        <span class="error-message" id="error-prenom-compte"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="email-compte">Email</label>
+                        <input type="email" id="email-compte" required>
+                        <span class="error-message" id="error-email-compte"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="password-compte">Mot de passe</label>
+                        <div class="password-container">
+                            <input type="password" id="password-compte" required>
+                            <i class="fa-solid fa-eye show-password" id="show-password-create"></i>
+                        </div>
+                        <span class="error-message" id="error-password-compte"></span>
+                    </div>
+                    <div class="form-group">
+                        <label for="confirm-password-compte">Confirmer le mot de passe</label>
+                        <div class="password-container">
+                            <input type="password" id="confirm-password-compte" required>
+                            <i class="fa-solid fa-eye show-password" id="show-password-confirm"></i>
+                        </div>
+                        <span class="error-message" id="error-confirm-password-compte"></span>
+                    </div>
+                    <button type="submit" class="bouton-creer-compte">Créer le profil</button>
+                </form>
+            </section>
+
+            <!-- Liste des profils -->
+            <section class="section-liste-nakama">
+                <h2>Liste des Profils <i class="fa-solid fa-scroll"></i></h2>
+                <table id="nakama-table">
+                    <thead>
+                        <tr>
+                            <th>Nom</th>
+                            <th>Prénom</th>
+                            <th>Email</th>
+                            <th>Date de création</th>
+                            <th>Statut</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <!-- Les profils créés apparaîtront ici -->
+                    </tbody>
+                </table>
+            </section>
+        </main>
+    </div>
+
+    <script>
+        // Attendre que la page soit chargée
+        document.addEventListener('DOMContentLoaded', function() {
             
-            <form id="userForm">
-                <div class="form-group">
-                    <label for="fullName">Nom complet :</label>
-                    <input type="text" id="fullName" required>
-                    <div class="error" id="nameError">Le nom complet est requis</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="email">Email :</label>
-                    <input type="email" id="email" required>
-                    <div class="error" id="emailError">Format d'email invalide</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="password">Mot de passe :</label>
-                    <input type="password" id="password" required>
-                    <div class="error" id="passwordError">Le mot de passe est requis</div>
-                </div>
-                
-                <div class="form-group">
-                    <label for="confirmPassword">Confirmation du mot de passe :</label>
-                    <input type="password" id="confirmPassword" required>
-                    <div class="error" id="confirmError">Les mots de passe ne correspondent pas</div>
-                </div>
-                
-                <button type="submit" class="btn btn-primary">Ajouter l'utilisateur</button>
-            </form>
+            // 1. VARIABLES - nos données
+            let adminEmail = 'admin@otaku.dev';
+            let adminPassword = 'sugoimypassword';
+            let profiles = [];
+            let nextId = 1;
+            
+            // 2. RÉCUPÉRER LES ÉLÉMENTS HTML
+            const loginForm = document.getElementById('login-form');
+            const loginScreen = document.getElementById('login-screen');
+            const adminDashboard = document.getElementById('admin-dashboard');
+            const createForm = document.getElementById('create-account-form');
+            const tableBody = document.querySelector('#nakama-table tbody');
+            const errorMessage = document.getElementById('error-message-global');
+            
+            // 3. FONCTIONS SIMPLES
+            
+            // Vérifier email
+            function checkEmail(email) {
+                return email.includes('@') && email.includes('.');
+            }
 
-            <div id="userList" class="user-list">
-                <h2>Liste des utilisateurs</h2>
-                <div id="users"></div>
-            </div>
-        </div>
-    </div>
+            // Vérifier mot de passe
+            function checkPassword(password) {
+                return password.length >= 8;
+            }
 
-    <script src="test.js"></script>
+            // Vérifier nom
+            function checkName(name) {
+                return name.length >= 2 && /^[A-Za-z\s]+$/.test(name);
+            }
+
+            // Effacer erreurs
+            function clearErrors() {
+                document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+                errorMessage.textContent = '';
+            }
+
+            // Afficher les profils dans le tableau
+            function showProfiles() {
+                tableBody.innerHTML = '';
+                
+                profiles.forEach(profile => {
+                    if (profile.visible) {
+                        const row = document.createElement('tr');
+                        row.dataset.id = profile.id;
+                        
+                        row.innerHTML = `
+                            <td>${profile.nom}</td>
+                            <td>${profile.prenom}</td>
+                            <td>${profile.email}</td>
+                            <td>${profile.creationDate}</td>
+                            <td><span class="statut-${profile.statut.replace(/\s/g, '-').toLowerCase()}">${profile.statut}</span></td>
+                            <td>
+                                <button class="bouton-action bouton-statut" data-action="toggle">
+                                    ${profile.statut === 'Validé' ? 'Annuler' : 'Valider'}
+                                </button>
+                                <button class="bouton-action bouton-supprimer" data-action="delete">
+                                    Supprimer
+                                </button>
+                            </td>
+                        `;
+                        tableBody.appendChild(row);
+                    }
+                });
+            }
+
+            // Gérer affichage mot de passe
+            function togglePassword(inputId, buttonId) {
+                const input = document.getElementById(inputId);
+                const button = document.getElementById(buttonId);
+                
+                button.addEventListener('click', function() {
+                    if (input.type === 'password') {
+                        input.type = 'text';
+                        button.classList.replace('fa-eye', 'fa-eye-slash');
+                    } else {
+                        input.type = 'password';
+                        button.classList.replace('fa-eye-slash', 'fa-eye');
+                    }
+                });
+            }
+
+            // Activer pour tous les mots de passe
+            togglePassword('password-login', 'show-password-login');
+            togglePassword('password-compte', 'show-password-create');
+            togglePassword('confirm-password-compte', 'show-password-confirm');
+
+            // 4. GESTION CONNEXION
+            loginForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                clearErrors();
+
+                const email = document.getElementById('email-login').value;
+                const password = document.getElementById('password-login').value;
+
+                if (email === adminEmail && password === adminPassword) {
+                    loginScreen.classList.add('hidden');
+                    adminDashboard.classList.remove('hidden');
+                    showProfiles();
+                } else {
+                    errorMessage.textContent = 'Identifiants incorrects ! 😠';
+                }
+            });
+
+            // 5. CRÉATION DE PROFIL
+            createForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                clearErrors();
+
+                const nom = document.getElementById('nom-compte').value.trim();
+                const prenom = document.getElementById('prenom-compte').value.trim();
+                const email = document.getElementById('email-compte').value.trim();
+                const password = document.getElementById('password-compte').value;
+                const confirmPassword = document.getElementById('confirm-password-compte').value;
+                
+                let hasError = false;
+
+                // Vérifications
+                if (!checkName(nom)) {
+                    document.getElementById('error-nom-compte').textContent = 'Nom invalide';
+                    hasError = true;
+                }
+                if (!checkName(prenom)) {
+                    document.getElementById('error-prenom-compte').textContent = 'Prénom invalide';
+                    hasError = true;
+                }
+                if (!checkEmail(email)) {
+                    document.getElementById('error-email-compte').textContent = 'Email invalide';
+                    hasError = true;
+                }
+                if (profiles.some(p => p.email === email)) {
+                    document.getElementById('error-email-compte').textContent = 'Email déjà utilisé';
+                    hasError = true;
+                }
+                if (!checkPassword(password)) {
+                    document.getElementById('error-password-compte').textContent = 'Mot de passe trop court (min 8)';
+                    hasError = true;
+                }
+                if (password !== confirmPassword) {
+                    document.getElementById('error-confirm-password-compte').textContent = 'Mots de passe différents';
+                    hasError = true;
+                }
+
+                // Si tout est ok, créer le profil
+                if (!hasError) {
+                    profiles.push({
+                        id: nextId++,
+                        nom: nom,
+                        prenom: prenom,
+                        email: email,
+                        password: password,
+                        creationDate: new Date().toISOString().slice(0, 10),
+                        statut: 'En attente de déploiement',
+                        visible: true
+                    });
+                    
+                    showProfiles();
+                    createForm.reset();
+                    
+                    errorMessage.textContent = 'Profil créé ! 🎉';
+                    errorMessage.classList.add('message-reussite');
+                    setTimeout(() => {
+                        errorMessage.textContent = '';
+                        errorMessage.classList.remove('message-reussite');
+                    }, 3000);
+                }
+            });
+
+            // 6. ACTIONS SUR LES PROFILS (Supprimer/Valider)
+            tableBody.addEventListener('click', function(e) {
+                if (e.target.tagName === 'BUTTON') {
+                    const action = e.target.dataset.action;
+                    const row = e.target.closest('tr');
+                    const id = parseInt(row.dataset.id);
+                    const profile = profiles.find(p => p.id === id);
+                    
+                    if (action === 'delete') {
+                        if (confirm('Supprimer ce profil ?')) {
+                            profile.visible = false;
+                            showProfiles();
+                            errorMessage.textContent = 'Profil supprimé ! 🗑️';
+                            errorMessage.classList.add('message-reussite');
+                            setTimeout(() => {
+                                errorMessage.textContent = '';
+                                errorMessage.classList.remove('message-reussite');
+                            }, 2000);
+                        }
+                    }
+                    
+                    if (action === 'toggle') {
+                        profile.statut = profile.statut === 'Validé' ? 'En attente de déploiement' : 'Validé';
+                        showProfiles();
+                        errorMessage.textContent = 'Statut changé ! ✅';
+                        errorMessage.classList.add('message-reussite');
+                        setTimeout(() => {
+                            errorMessage.textContent = '';
+                            errorMessage.classList.remove('message-reussite');
+                        }, 2000);
+                    }
+                }
+            });
+        });
+    </script>
 </body>
 </html>
