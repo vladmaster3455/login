@@ -1,189 +1,216 @@
-  const predefinedUsers = [
-            { email: "admin@example.com", password: "admin123" },
-            { email: "user1@example.com", password: "password1" },
-            { email: "user2@example.com", password: "password2" }
-        ];
+document.addEventListener('DOMContentLoaded', function() {
+    
+    // =========================================================================
+    // 1. DÉCLARATION ET INITIALISATION DES DONNÉES
+    // =========================================================================
+    const adminEmail = 'admin@otaku.dev';
+    const adminPassword = 'sugoimypassword';
 
-        // Tableau pour stocker les nouveaux utilisateurs créés
-        let createdUsers = loadUsersFromStorage();
+    function loadFromLocalStorage(key, defaultValue) {
+        const storedData = localStorage.getItem(key);
+        return storedData ? JSON.parse(storedData) : defaultValue;
+    }
 
-        // Fonctions pour gérer le localStorage
-        function saveUsersToStorage() {
-            try {
-                localStorage.setItem('createdUsers', JSON.stringify(createdUsers));
-            } catch (error) {
-                console.warn('localStorage non supporté:', error);
-            }
-        }
+    function saveToLocalStorage(key, data) {
+        localStorage.setItem(key, JSON.stringify(data));
+    }
 
-        function loadUsersFromStorage() {
-            try {
-                const stored = localStorage.getItem('createdUsers');
-                if (stored) {
-                    return JSON.parse(stored).map(user => ({
-                        ...user,
-                        createdAt: new Date(user.createdAt)
-                    }));
-                }
-            } catch (error) {
-                console.warn('Erreur lors du chargement depuis localStorage:', error);
-            }
-            return [];
-        }
+    // Chargement des profils au démarrage. Le tableau 'profiles' est notre base de données.
+    let profiles = loadFromLocalStorage('profiles', []);
+    let nextId = profiles.length > 0 ? Math.max(...profiles.map(p => p.id)) + 1 : 1;
 
-        // Expression régulière pour valider l'email
-        const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+    // =========================================================================
+    // 2. SÉLECTION DES ÉLÉMENTS HTML
+    // =========================================================================
+    const loginForm = document.getElementById('login-form');
+    const loginScreen = document.getElementById('login-screen');
+    const adminDashboard = document.getElementById('admin-dashboard');
+    const createForm = document.getElementById('create-account-form');
+    const tableBody = document.querySelector('#nakama-table tbody');
+    const errorMessage = document.getElementById('error-message-global');
+    
+    // =========================================================================
+    // 3. FONCTIONS POUR LA LOGIQUE DU PROJET
+    // =========================================================================
+    
+    function checkEmail(email) {
+        return email.includes('@') && email.includes('.');
+    }
 
-        // Fonction pour valider l'email
-        function validateEmail(email) {
-            return emailRegex.test(email);
-        }
+    function checkPassword(password) {
+        return password.length >= 8;
+    }
 
-        // Fonction pour formater la date et l'heure
-        function formatDateTime(date) {
-            const options = {
-                year: 'numeric',
-                month: 'long',
-                day: 'numeric',
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            };
-            return date.toLocaleDateString('fr-FR', options);
-        }
+    function checkName(name) {
+        return name.length >= 2 && /^[A-Za-z\s]+$/.test(name);
+    }
 
-        // Gestion de la connexion
-        document.getElementById('loginForm').addEventListener('submit', function(e) {
-            e.preventDefault();
+    function clearErrors() {
+        document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+        errorMessage.textContent = '';
+    }
+    
+    // Fonction principale pour afficher les profils dans le tableau
+    function showProfiles() {
+        tableBody.innerHTML = '';
+        
+        // Affiche uniquement les profils dont la propriété 'visible' est 'true'
+        profiles.filter(profile => profile.visible)
+        .forEach(profile => {
+            const row = document.createElement('tr');
+            row.dataset.id = profile.id;
             
-            const email = document.getElementById('loginEmail').value;
-            const password = document.getElementById('loginPassword').value;
-            const loginError = document.getElementById('loginError');
-            
-            // Vérifier les identifiants
-            const validUser = predefinedUsers.find(user => 
-                user.email === email && user.password === password
-            );
-            
-            if (validUser) {
-                // Connexion réussie
-                document.getElementById('loginPage').classList.add('hidden');
-                document.getElementById('homePage').classList.remove('hidden');
-                loginError.style.display = 'none';
-            } else {
-                // Connexion échouée
-                loginError.style.display = 'block';
-            }
+            row.innerHTML = `
+                <td>${profile.nom}</td>
+                <td>${profile.prenom}</td>
+                <td>${profile.email}</td>
+                <td>${profile.creationDate}</td>
+                <td><span class="statut-${profile.statut.replace(/\s/g, '-').toLowerCase()}">${profile.statut}</span></td>
+                <td>
+                    <button class="bouton-action bouton-statut" data-action="toggle">
+                        ${profile.statut === 'Validé' ? 'Annuler' : 'Valider'}
+                    </button>
+                    <button class="bouton-action bouton-supprimer" data-action="delete">
+                        Supprimer
+                    </button>
+                </td>
+            `;
+            tableBody.appendChild(row);
         });
+    }
 
-        // Gestion du formulaire d'ajout d'utilisateur
-        document.getElementById('userForm').addEventListener('submit', function(e) {
-            e.preventDefault();
-            
-            const fullName = document.getElementById('fullName').value.trim();
-            const email = document.getElementById('email').value.trim();
-            const password = document.getElementById('password').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            // Reset des erreurs
-             document.querySelectorAll('.error').forEach(error => error.style.display = 'none');
-            
-            let isValid = true;
-            
-            // Validation du nom complet
-            if (!fullName) {
-                document.getElementById('nameError').style.display = 'block';
-                isValid = false;
-            }
-            
-            // Validation de l'email
-            if (!validateEmail(email)) {
-                document.getElementById('emailError').style.display = 'block';
-                isValid = false;
-            }
-            
-            // Validation du mot de passe
-            if (!password) {
-                document.getElementById('passwordError').style.display = 'block';
-                isValid = false;
-            }
-            
-            // Validation de la confirmation du mot de passe
-            if (password !== confirmPassword) {
-                document.getElementById('confirmError').style.display = 'block';
-                isValid = false;
-            }
-            
-            if (isValid) {
-                // Créer un nouvel utilisateur
-                const newUser = {
-                    id: Date.now(),
-                    fullName: fullName,
-                    email: email,
-                    createdAt: new Date(),
-                    disabled: false
-                };
-                
-                createdUsers.push(newUser);
-                saveUsersToStorage(); // Sauvegarder dans localStorage
-                displayUsers();
-                
-                // Reset du formulaire
-                document.getElementById('userForm').reset();
-            }
-        });
-
-        // Fonction pour afficher les utilisateurs
-        function displayUsers() {
-            const usersContainer = document.getElementById('users');
-            usersContainer.innerHTML = '';
-            
-            createdUsers.forEach(user => {
-                const userDiv = document.createElement('div');
-                userDiv.className = `user-item ${user.disabled ? 'disabled' : ''}`;
-                userDiv.innerHTML = `
-                    <div class="user-info">
-                        <h3>${user.fullName}</h3>
-                        <p><strong>Email:</strong> ${user.email}</p>
-                        <p><strong>Créé le:</strong> ${formatDateTime(user.createdAt)}</p>
-                    </div>
-                    <div class="user-actions">
-                        <button class="btn btn-small ${user.disabled ? 'btn-success' : 'btn-warning'}" 
-                                onclick="toggleUser(${user.id})">
-                            ${user.disabled ? 'Activer' : 'Désactiver'}
-                        </button>
-                        <button class="btn btn-small btn-danger" onclick="deleteUser(${user.id})">
-                            Supprimer
-                        </button>
-                    </div>
-                `;
-                usersContainer.appendChild(userDiv);
+    function togglePassword(inputId, buttonId) {
+        const input = document.getElementById(inputId);
+        const button = document.getElementById(buttonId);
+        
+        if (button && input) {
+            button.addEventListener('click', function() {
+                const isPassword = input.type === 'password';
+                input.type = isPassword ? 'text' : 'password';
+                button.classList.toggle('fa-eye', !isPassword);
+                button.classList.toggle('fa-eye-slash', isPassword);
             });
         }
+    }
 
-        // Fonction pour activer/désactiver un utilisateur
-        function toggleUser(userId) {
-            const user = createdUsers.find(u => u.id === userId);
-            if (user) {
-                user.disabled = !user.disabled;
-                saveUsersToStorage(); // Sauvegarder dans localStorage
-                displayUsers();
-            }
+    // =========================================================================
+    // 4. GESTION DES ÉVÉNEMENTS
+    // =========================================================================
+    loginForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        clearErrors();
+
+        const email = document.getElementById('email-login').value;
+        const password = document.getElementById('password-login').value;
+
+        if (email === adminEmail && password === adminPassword) {
+            loginScreen.classList.add('hidden');
+            adminDashboard.classList.remove('hidden');
+            showProfiles();
+        } else {
+            errorMessage.textContent = 'Identifiants incorrects ! ';
+        }
+    });
+
+    createForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        clearErrors();
+
+        const nom = document.getElementById('nom-compte').value.trim();
+        const prenom = document.getElementById('prenom-compte').value.trim();
+        const email = document.getElementById('email-compte').value.trim();
+        const password = document.getElementById('password-compte').value;
+        const confirmPassword = document.getElementById('confirm-password-compte').value;
+        
+        let hasError = false;
+
+        if (!checkName(nom)) {
+            document.getElementById('error-nom-compte').textContent = 'Nom invalide'; hasError = true;
+        }
+        if (!checkName(prenom)) {
+            document.getElementById('error-prenom-compte').textContent = 'Prénom invalide'; hasError = true;
+        }
+        if (!checkEmail(email)) {
+            document.getElementById('error-email-compte').textContent = 'Email invalide'; hasError = true;
+        }
+        if (profiles.some(p => p.email === email)) {
+            document.getElementById('error-email-compte').textContent = 'Email déjà utilisé'; hasError = true;
+        }
+        if (!checkPassword(password)) {
+            document.getElementById('error-password-compte').textContent = 'Mot de passe trop court (min 8)'; hasError = true;
+        }
+        if (password !== confirmPassword) {
+            document.getElementById('error-confirm-password-compte').textContent = 'Mots de passe différents'; hasError = true;
         }
 
-        // Fonction pour supprimer un utilisateur
-        function deleteUser(userId) {
-            if (confirm('Êtes-vous sûr de vouloir supprimer cet utilisateur ?')) {
-                createdUsers = createdUsers.filter(u => u.id !== userId);
-                saveUsersToStorage(); // Sauvegarder dans localStorage
-                displayUsers();
+        if (!hasError) {
+            const newProfile = {
+                id: nextId++,
+                nom: nom,
+                prenom: prenom,
+                email: email,
+                password: password,
+                creationDate: new Date().toISOString().slice(0, 10),
+                statut: 'En attente de validation',
+                visible: true // Par défaut, un nouveau profil est visible
+            };
+            
+            profiles.push(newProfile);
+            saveToLocalStorage('profiles', profiles);
+            
+            showProfiles();
+            createForm.reset();
+            
+            errorMessage.textContent = 'Profil créé ';
+            errorMessage.classList.add('message-reussite');
+            setTimeout(() => {
+                errorMessage.textContent = '';
+                errorMessage.classList.remove('message-reussite');
+            }, 3000);
+        }
+    });
+    tableBody.addEventListener('click', function(e) {
+        if (e.target.tagName === 'BUTTON') {
+            const action = e.target.dataset.action;
+            const row = e.target.closest('tr');
+            const id = parseInt(row.dataset.id);
+            const profile = profiles.find(p => p.id === id);
+            
+            if (action === 'delete') {
+                if (confirm('Supprimer ce profil ?')) {
+                    // Au lieu de le supprimer, on le cache
+                    profile.visible = false;
+                    saveToLocalStorage('profiles', profiles); // Sauvegarde l'état caché
+                    showProfiles();
+                    errorMessage.textContent = 'Profil supprimé (caché) !';
+                    errorMessage.classList.add('message-reussite');
+                    setTimeout(() => {
+                        errorMessage.textContent = '';
+                        errorMessage.classList.remove('message-reussite');
+                    }, 2000);
+                }
+            }
+            
+            if (action === 'toggle') {
+                profile.statut = profile.statut === 'Validé' ? 'En attente de validation' : 'Validé';
+                saveToLocalStorage('profiles', profiles);
+                showProfiles();
+                errorMessage.textContent = 'Statut changé !';
+                errorMessage.classList.add('message-reussite');
+                setTimeout(() => {
+                    errorMessage.textContent = '';
+                    errorMessage.classList.remove('message-reussite');
+                }, 2000);
             }
         }
+    });
 
-       
-        // Charger et afficher les utilisateurs au chargement de la page
-        document.addEventListener('DOMContentLoaded', function() {
-            if (createdUsers.length > 0) {
-                displayUsers();
-            }
-        });
+    // =========================================================================
+    // 5. INITIALISATION
+    // =========================================================================
+    togglePassword('password-login', 'show-password-login');
+    togglePassword('password-compte', 'show-password-create');
+    togglePassword('confirm-password-compte', 'show-password-confirm');
+
+    showProfiles();
+});
