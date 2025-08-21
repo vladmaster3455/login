@@ -34,7 +34,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // =========================================================================
     
     function checkEmail(email) {
-        return email.includes('@') && email.includes('.');
+        return email.length >= 5 && /^'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/.test(email);
     }
 
     function checkPassword(password) {
@@ -61,20 +61,21 @@ document.addEventListener('DOMContentLoaded', function() {
             row.dataset.id = profile.id;
             
             row.innerHTML = `
-                <td>${profile.nom}</td>
-                <td>${profile.prenom}</td>
-                <td>${profile.email}</td>
-                <td>${profile.creationDate}</td>
-                <td><span class="statut-${profile.statut.replace(/\s/g, '-').toLowerCase()}">${profile.statut}</span></td>
-                <td>
-                    <button class="bouton-action bouton-statut" data-action="toggle">
-                        ${profile.statut === 'Validé' ? 'Annuler' : 'Valider'}
-                    </button>
-                    <button class="bouton-action bouton-supprimer" data-action="delete">
-                        Supprimer
-                    </button>
-                </td>
-            `;
+    <td data-label="Nom">${profile.nom}</td>
+    <td data-label="Prénom">${profile.prenom}</td>
+    <td data-label="Email">${profile.email}</td>
+    <td data-label="Date de création">${profile.creationDate}</td>
+    <td data-label="Statut"><span class="statut-${profile.statut.replace(/\s/g, '-').toLowerCase()}">${profile.statut}</span></td>
+    <td data-label="Actions">
+        <button class="bouton-action bouton-statut" data-action="toggle">
+            ${profile.statut === 'Validé' ? 'Annuler' : 'Valider'}
+        </button>
+        <button class="bouton-action bouton-supprimer" data-action="delete">
+            Supprimer
+        </button>
+    </td>
+`;
+
             tableBody.appendChild(row);
         });
     }
@@ -151,7 +152,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 email: email,
                 password: password,
                 creationDate: new Date().toISOString().slice(0, 10),
-                statut: 'En attente de validation',
+                statut: 'En cours',
                 visible: true // Par défaut, un nouveau profil est visible
             };
             
@@ -192,7 +193,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }
             
             if (action === 'toggle') {
-                profile.statut = profile.statut === 'Validé' ? 'En attente de validation' : 'Validé';
+                profile.statut = profile.statut === 'Validé' ? 'En cours' : 'Validé';
                 saveToLocalStorage('profiles', profiles);
                 showProfiles();
                 errorMessage.textContent = 'Statut changé !';

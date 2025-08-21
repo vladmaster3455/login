@@ -6,7 +6,6 @@
 
 body {
     font-family: Arial, sans-serif;
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
     min-height: 100vh;
     color: #333;
 }
@@ -58,10 +57,7 @@ body {
     font-size: 16px;
 }
 
-.form-group input:focus {
-    border-color: #667eea;
-    outline: none;
-}
+
 
 .password-container {
     position: relative;
@@ -100,12 +96,12 @@ body {
 }
 
 .bouton-sasuke {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+    background: #667eea;
     color: white;
 }
 
 .bouton-creer-compte {
-    background: linear-gradient(135deg, #56ab2f 0%, #a8e6cf 100%);
+    background-color:#667eea ;
     color: white;
 }
 
@@ -160,14 +156,7 @@ th, td {
     border-bottom: 1px solid #eee;
 }
 
-th {
-    background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-    color: white;
-}
 
-tr:hover {
-    background-color: #f8f9ff;
-}
 
 .statut-validé {
     background: #27ae60;
@@ -206,4 +195,91 @@ tr:hover {
 .bouton-supprimer {
     background: #e74c3c;
     color: white;
+}
+
+/* ==================== RESPONSIVITÉ ==================== */
+
+/* Pour les petits écrans (smartphones ≤ 768px) */
+@media (max-width: 768px) {
+    .login-card {
+        padding: 20px;
+        max-width: 90%;
+    }
+
+    .titre-senpai {
+        font-size: 1.5em;
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+
+    .section-creer-compte, .section-liste-nakama {
+        padding: 20px;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 10px;
+    }
+}
+
+/* Pour les très petits écrans (≤ 480px) */
+/* ==================== RESPONSIVITÉ SIMPLIFIÉE ==================== */
+
+/* Pour les écrans ≤ 768px (tablettes et smartphones) */
+@media (max-width: 768px) {
+    .login-card {
+        padding: 20px;
+        max-width: 90%;
+    }
+
+    .titre-senpai {
+        font-size: 1.5em;
+    }
+
+    .main-content {
+        padding: 15px;
+    }
+
+    .section-creer-compte, .section-liste-nakama {
+        padding: 20px;
+    }
+
+    table {
+        font-size: 14px;
+    }
+
+    th, td {
+        padding: 10px;
+    }
+}
+
+/* Pour les très petits écrans (≤ 480px) */
+@media (max-width: 480px) {
+    .login-card h1 {
+        font-size: 1.3em;
+    }
+
+    .form-group input {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    .bouton-sasuke, .bouton-creer-compte {
+        font-size: 14px;
+        padding: 10px;
+    }
+
+    /* ✅ Tableau scrollable sur mobile */
+    .section-liste-nakama {
+        overflow-x: auto;
+    }
+
+    table {
+        min-width: 600px; /* largeur minimale pour forcer le scroll */
+    }
 }
