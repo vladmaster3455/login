@@ -2,9 +2,9 @@ document.addEventListener('DOMContentLoaded', function() {
     
     // =========================================================================
     // 1. DÉCLARATION ET INITIALISATION DES DONNÉES
-    // =========================================================================
-    const adminEmail = 'admin@otaku.dev';
-    const adminPassword = 'sugoimypassword';
+    // ====================================================================
+    const adminEmail = 'admin@gmail.com';
+    const adminPassword = 'passer123';
 
     function loadFromLocalStorage(key, defaultValue) {
         const storedData = localStorage.getItem(key);
@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', function() {
     function saveToLocalStorage(key, data) {
         localStorage.setItem(key, JSON.stringify(data));
     }
+    
 
     // Chargement des profils au démarrage. Le tableau 'profiles' est notre base de données.
     let profiles = loadFromLocalStorage('profiles', []);
@@ -34,7 +35,8 @@ document.addEventListener('DOMContentLoaded', function() {
     // =========================================================================
     
     function checkEmail(email) {
-        return email.length >= 5 && /^'[A-Za-z0-9._%+-]+@[A-Za-z0-9.-]+\.[A-Z|a-z]{2,}$/.test(email);
+        const emailPattern = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
+        return emailPattern.test(email);
     }
 
     function checkPassword(password) {
@@ -46,8 +48,40 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function clearErrors() {
-        document.querySelectorAll('.error-message').forEach(el => el.textContent = '');
+        // Effacer les anciens messages d'erreur
+        document.querySelectorAll('.error-message').forEach(el => {
+            el.textContent = '';
+            el.style.display = 'none';
+        });
+        // Effacer nos nouveaux messages d'erreur
+        document.querySelectorAll('.error-message-custom').forEach(el => {
+            el.remove();
+        });
         errorMessage.textContent = '';
+    }
+
+    // Nouvelle fonction pour afficher les erreurs en rouge sous les champs
+    function showError(fieldId, message) {
+        const field = document.getElementById(fieldId);
+        if (field) {
+            // Chercher s'il y a déjà un message d'erreur
+            let errorElement = field.parentNode.querySelector('.error-message-custom');
+            
+            // Si pas de message d'erreur, en créer un
+            if (!errorElement) {
+                errorElement = document.createElement('div');
+                errorElement.className = 'error-message-custom';
+                field.parentNode.appendChild(errorElement);
+            }
+            
+            // Afficher le message en rouge
+            errorElement.textContent = message;
+            errorElement.style.color = 'red';
+            errorElement.style.fontSize = '14px';
+            errorElement.style.marginTop = '5px';
+            errorElement.style.display = 'block';
+            errorElement.style.fontWeight = '500';
+        }
     }
     
     // Fonction principale pour afficher les profils dans le tableau
@@ -80,29 +114,40 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     }
 
-    function togglePassword(inputId, buttonId) {
-        const input = document.getElementById(inputId);
-        const button = document.getElementById(buttonId);
-        
-        if (button && input) {
-            button.addEventListener('click', function() {
-                const isPassword = input.type === 'password';
-                input.type = isPassword ? 'text' : 'password';
-                button.classList.toggle('fa-eye', !isPassword);
-                button.classList.toggle('fa-eye-slash', isPassword);
-            });
-        }
-    }
+    
 
     // =========================================================================
     // 4. GESTION DES ÉVÉNEMENTS
     // =========================================================================
+    
+    // Désactiver la validation HTML5 par défaut
+    if (loginForm) loginForm.setAttribute('novalidate', true);
+    if (createForm) createForm.setAttribute('novalidate', true);
+
     loginForm.addEventListener('submit', function(e) {
         e.preventDefault();
         clearErrors();
 
-        const email = document.getElementById('email-login').value;
+        const email = document.getElementById('email-login').value.trim();
         const password = document.getElementById('password-login').value;
+
+        let hasError = false;
+
+        // Validation des champs de connexion
+        if (!email) {
+            showError('email-login', 'Veuillez saisir votre email');
+            hasError = true;
+        } else if (!checkEmail(email)) {
+            showError('email-login', 'Email invalide');
+            hasError = true;
+        }
+
+        if (!password) {
+            showError('password-login', 'Veuillez saisir votre mot de passe');
+            hasError = true;
+        }
+
+        if (hasError) return;
 
         if (email === adminEmail && password === adminPassword) {
             loginScreen.classList.add('hidden');
@@ -125,23 +170,48 @@ document.addEventListener('DOMContentLoaded', function() {
         
         let hasError = false;
 
-        if (!checkName(nom)) {
-            document.getElementById('error-nom-compte').textContent = 'Nom invalide'; hasError = true;
+        // Validation avec messages personnalisés
+        if (!nom) {
+            showError('nom-compte', 'Veuillez saisir votre nom');
+            hasError = true;
+        } else if (!checkName(nom)) {
+            showError('nom-compte', 'Nom invalide');
+            hasError = true;
         }
-        if (!checkName(prenom)) {
-            document.getElementById('error-prenom-compte').textContent = 'Prénom invalide'; hasError = true;
+
+        if (!prenom) {
+            showError('prenom-compte', 'Veuillez saisir votre prénom');
+            hasError = true;
+        } else if (!checkName(prenom)) {
+            showError('prenom-compte', 'Prénom invalide');
+            hasError = true;
         }
-        if (!checkEmail(email)) {
-            document.getElementById('error-email-compte').textContent = 'Email invalide'; hasError = true;
+
+        if (!email) {
+            showError('email-compte', 'Veuillez saisir votre email');
+            hasError = true;
+        } else if (!checkEmail(email)) {
+            showError('email-compte', 'Email invalide');
+            hasError = true;
+        } else if (profiles.some(p => p.email === email)) {
+            showError('email-compte', 'Email déjà utilisé');
+            hasError = true;
         }
-        if (profiles.some(p => p.email === email)) {
-            document.getElementById('error-email-compte').textContent = 'Email déjà utilisé'; hasError = true;
+
+        if (!password) {
+            showError('password-compte', 'Veuillez saisir un mot de passe');
+            hasError = true;
+        } else if (!checkPassword(password)) {
+            showError('password-compte', 'Mot de passe trop court (min 8)');
+            hasError = true;
         }
-        if (!checkPassword(password)) {
-            document.getElementById('error-password-compte').textContent = 'Mot de passe trop court (min 8)'; hasError = true;
-        }
-        if (password !== confirmPassword) {
-            document.getElementById('error-confirm-password-compte').textContent = 'Mots de passe différents'; hasError = true;
+
+        if (!confirmPassword) {
+            showError('confirm-password-compte', 'Veuillez confirmer votre mot de passe');
+            hasError = true;
+        } else if (password !== confirmPassword) {
+            showError('confirm-password-compte', 'Mots de passe différents');
+            hasError = true;
         }
 
         if (!hasError) {
@@ -170,6 +240,7 @@ document.addEventListener('DOMContentLoaded', function() {
             }, 3000);
         }
     });
+
     tableBody.addEventListener('click', function(e) {
         if (e.target.tagName === 'BUTTON') {
             const action = e.target.dataset.action;
@@ -205,13 +276,6 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         }
     });
-
-    // =========================================================================
-    // 5. INITIALISATION
-    // =========================================================================
-    togglePassword('password-login', 'show-password-login');
-    togglePassword('password-compte', 'show-password-create');
-    togglePassword('confirm-password-compte', 'show-password-confirm');
 
     showProfiles();
 });

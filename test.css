@@ -230,6 +230,8 @@ th, td {
 /* Pour les très petits écrans (≤ 480px) */
 /* ==================== RESPONSIVITÉ SIMPLIFIÉE ==================== */
 
+
+
 /* Pour les écrans ≤ 768px (tablettes et smartphones) */
 @media (max-width: 768px) {
     .login-card {
@@ -274,7 +276,7 @@ th, td {
         padding: 10px;
     }
 
-    /* ✅ Tableau scrollable sur mobile */
+    /* Tableau scrollable sur mobile */
     .section-liste-nakama {
         overflow-x: auto;
     }
@@ -282,4 +284,11 @@ th, td {
     table {
         min-width: 600px; /* largeur minimale pour forcer le scroll */
     }
+
+   
+
+
+.field-error {
+    border: 2px solid red;
+}
 }
